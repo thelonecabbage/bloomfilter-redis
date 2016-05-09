@@ -70,6 +70,7 @@ Quick Syntax
 
 ```
 
+
 Quick Benchmarks
 ================
 
