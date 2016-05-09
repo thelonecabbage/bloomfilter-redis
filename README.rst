@@ -30,6 +30,46 @@ have to take care of a bunch of things: Storing to and retrieving from Redis tak
 time. Timestamps aren't all that exact, especially when running on a virtual machine. If
 you're using multiple machines, their clocks have to be perfectly in sync.
 
+
+Quick Syntax
+======
+```python
+connection = redis.Redis()
+
+# directly initialize bloom filter
+# n = the ultimate bit length of the bloom
+# k = the number of hashes for each entry
+single = BloomFilter(connection=self.connection,
+                     bitvector_key='test_bloomfilter',
+                     n=1024,
+                     k=4)
+
+# simple initialize bloom filter
+# calculates the n & k automatically
+# will reset the filter when ever single.fill > fill_max (0.75)
+single = BloomFilter(connection=self.connection,
+                     bitvector_key='test_bloomfilter',
+                     elements=10000,
+                     probability=0.01,
+                     fill_max=0.75)
+
+# add a single value to the bloom
+single.add('192.168.0.1')
+
+# add many values to the bloom
+# roughly 2-4 times as fast as looping through single.add
+single.extend(['192.168.0.2', '192.168.0.3'])
+
+
+assert('192.168.0.2' in single)
+assert('0.0.0.0' not in single)
+
+assert(not single.is_full)
+
+assert(single.fill < 0.01)
+
+```
+
 Quick Benchmarks
 ================
 
